@@ -1,9 +1,8 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, Menu, Plus, Search, Mic } from "lucide-react";
+import { Send, Menu, Mic } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import ChatSidebar from "@/components/ChatSidebar";
 import ChatMessage from "@/components/ChatMessage";
@@ -60,7 +59,18 @@ const ChatPage = () => {
   );
   const [inputValue, setInputValue] = useState("");
   const [showComparisonTable, setShowComparisonTable] = useState(!!initialQuery);
+  const [user, setUser] = useState<{ email: string } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Check if user is logged in
+    const storedUser = localStorage.getItem("capcipcup-user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+      // Auto-open sidebar for logged-in users
+      setSidebarOpen(true);
+    }
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -103,7 +113,7 @@ Based on my research, here are the key points to consider:`,
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Sidebar */}
+      {/* Sidebar - Always rendered but visible based on sidebarOpen state */}
       <ChatSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       
       {/* Main Content */}

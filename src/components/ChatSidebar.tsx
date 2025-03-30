@@ -7,6 +7,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -55,6 +56,7 @@ const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
   const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState("");
   const [filteredChats, setFilteredChats] = useState(sampleChatHistory);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   
   useEffect(() => {
     if (searchValue) {
@@ -83,22 +85,33 @@ const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
   }, {} as Record<string, typeof sampleChatHistory>);
 
   return (
-    <Sheet open={isOpen} onOpenChange={onClose}>
+    <Sheet open={isOpen && !isCollapsed} onOpenChange={onClose}>
       <SheetContent 
         side="left" 
-        className="w-80 p-0 max-w-full border-r"
+        className="p-0 border-r transition-all duration-300 z-50 w-[280px]"
       >
         <div className="flex flex-col h-full">
-          <SheetHeader className="p-4">
-            <SheetTitle className="text-left gradient-text">capcipcup.ai</SheetTitle>
-          </SheetHeader>
+          <div className="p-4 flex items-center justify-between">
+            <SheetTitle className={`text-left gradient-text transition-opacity duration-300 ${isCollapsed ? 'hidden' : 'block'}`}>capcipcup.ai</SheetTitle>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="h-8 w-8 ml-auto"
+            >
+              {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+            </Button>
+          </div>
           
           <div className="p-4 space-y-4">
-            <Button onClick={handleNewChat} className="w-full justify-start gap-2">
-              <Plus className="h-4 w-4" /> New comparison
+            <Button onClick={handleNewChat} className={`w-full justify-center ${isCollapsed ? 'px-0' : 'justify-start gap-2'}`}>
+              <Plus className="h-4 w-4" />
+              <span className={`transition-all duration-300 ${isCollapsed ? 'hidden' : 'block'}`}>
+                New comparison
+              </span>
             </Button>
             
-            <div className="relative">
+            <div className={`relative transition-opacity duration-300 ${isCollapsed ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100'}`}>
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search comparisons..."
@@ -116,7 +129,7 @@ const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
               <div className="space-y-6 p-4">
                 {Object.entries(groupedChats).map(([category, chats]) => (
                   <div key={category} className="space-y-2">
-                    <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    <h3 className={`text-xs font-medium text-muted-foreground uppercase tracking-wider transition-opacity duration-300 ${isCollapsed ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100'}`}>
                       {category}
                     </h3>
                     
@@ -131,8 +144,8 @@ const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
                             onClose();
                           }}
                         >
-                          <MessageSquare className="h-4 w-4 mr-2 shrink-0" />
-                          <span className="truncate">{chat.title}</span>
+                          <MessageSquare className="h-4 w-4 shrink-0" />
+                          <span className={`truncate ml-2 transition-all duration-300 ${isCollapsed ? 'hidden' : 'block'}`}>{chat.title}</span>
                         </Button>
                       ))}
                     </div>

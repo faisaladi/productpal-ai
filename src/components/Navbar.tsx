@@ -8,7 +8,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
-import { Menu, Twitter, Github, Linkedin, LogOut, User } from "lucide-react";
+import { Twitter, Github, Linkedin, LogOut, User, Menu } from "lucide-react";
+import SidebarButton from "./SidebarButton";
 import { useToast } from "@/hooks/use-toast";
 
 interface NavbarProps {
@@ -44,15 +45,7 @@ const Navbar = ({ showSidebarToggle, onSidebarToggle }: NavbarProps) => {
       <div className="flex items-center justify-between h-16 px-4">
         <div className="flex items-center gap-4">
           {showSidebarToggle && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onSidebarToggle}
-              className="md:hidden"
-            >
-              <Menu className="h-5 w-5" />
-              <span className="sr-only">Toggle menu</span>
-            </Button>
+            <SidebarButton onClick={onSidebarToggle} />
           )}
           
           <Link to="/" className="flex items-center">

@@ -40,10 +40,10 @@ const LandingPage = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
-        <div className="w-full max-w-3xl mx-auto text-center">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 gradient-text animate-gradient-x">
-            Take decision faster
+      <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-6 py-12">
+        <div className="w-full max-w-5xl mx-auto text-center">
+          <h1 className="text-4xl sm:text-4xl md:text-6xl font-bold mb-1 pt-4 pb-4 gradient-text animate-gradient-x leading-relaxed">
+            Make decisions faster
           </h1>
           
           <p className="text-lg sm:text-xl md:text-2xl mb-8 text-muted-foreground">
@@ -69,7 +69,7 @@ const LandingPage = () => {
           </form>
           
           <div className="text-left">
-            <h2 className="text-lg font-medium mb-4">Example questions</h2>
+            <h2 className="text-lg font-medium pt-4 mb-4">Example questions</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <TemplateCard 
                 title="Product Comparison" 
@@ -94,17 +94,11 @@ const LandingPage = () => {
             © 2023 Capcipcup.ai. All rights reserved.
           </p>
           <div className="flex items-center space-x-4">
-            <Link to="#" className="text-muted-foreground hover:text-foreground">
-              <Twitter className="h-5 w-5" />
-              <span className="sr-only">Twitter</span>
+            <Link to="/privacy" className="text-sm text-muted-foreground hover:text-foreground">
+              Privacy Policy
             </Link>
-            <Link to="#" className="text-muted-foreground hover:text-foreground">
-              <Github className="h-5 w-5" />
-              <span className="sr-only">GitHub</span>
-            </Link>
-            <Link to="#" className="text-muted-foreground hover:text-foreground">
-              <Linkedin className="h-5 w-5" />
-              <span className="sr-only">LinkedIn</span>
+            <Link to="/terms" className="text-sm text-muted-foreground hover:text-foreground">
+              Terms & Conditions
             </Link>
           </div>
         </div>

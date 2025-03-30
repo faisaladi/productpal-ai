@@ -40,26 +40,28 @@ const App = () => {
         <Toaster />
         <Sonner />
         <SidebarProvider defaultOpen={true}>
-          {shouldUseLayout ? (
-            <MainLayout>
+          <div className="w-full">
+            {shouldUseLayout ? (
+              <MainLayout>
+                <Routes>
+                  <Route path="/" element={<LandingPage />} />
+                  <Route path="/chat" element={<ChatPage />} />
+                  <Route path="/privacy" element={<PrivacyPolicy />} />
+                  <Route path="/terms" element={<TermsConditions />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </MainLayout>
+            ) : (
               <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/chat" element={<ChatPage />} />
+                <Route path="/login" element={<LoginPage />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/terms" element={<TermsConditions />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
-            </MainLayout>
-          ) : (
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/chat" element={<ChatPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/privacy" element={<PrivacyPolicy />} />
-              <Route path="/terms" element={<TermsConditions />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          )}
+            )}
+          </div>
         </SidebarProvider>
       </TooltipProvider>
     </QueryClientProvider>

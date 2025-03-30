@@ -161,12 +161,21 @@
   @apply cursor-pointer transition-all duration-200 hover:bg-primary/20;
 }
 
-/* Animated gradient */
+/* Animated gradient - improved with slower animation */
 .animated-gradient {
-  background: linear-gradient(135deg, #9b87f5 0%, #7161ef 25%, #9b87f5 50%, #7161ef 75%, #9b87f5 100%);
-  background-size: 300% 300%;
-  animation: gradient-shift 8s ease infinite;
+  background: linear-gradient(135deg, 
+    #9b87f5 0%, 
+    #7161ef 25%, 
+    #9b87f5 50%, 
+    #7161ef 75%, 
+    #9b87f5 100%
+  );
+  background-size: 400% 400%;
+  animation: gradient-shift 10s ease infinite;
   @apply bg-clip-text text-transparent;
+  padding: 0.1em 0;
+  margin: -0.1em 0;
+  line-height: 1.5;
 }
 
 @keyframes gradient-shift {
@@ -182,6 +191,31 @@
 }
 
 /* Line height for better text spacing */
+.leading-relaxed {
+  line-height: 1.6;
+}
+
+/* Larger line height for paragraph text */
 .larger-line-height {
-  line-height: 1.4;
+  line-height: 1.7;
+}
+
+/* Making chat container bigger */
+.chat-container {
+  min-height: calc(100vh - 4rem);
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+/* Chat message area with larger height */
+.chat-messages {
+  height: calc(100vh - 12rem);
+  overflow-y: auto;
+}
+
+/* Chat input area with more padding */
+.chat-input {
+  @apply p-4;
 }

@@ -39,12 +39,12 @@ const Navbar = ({ showSidebarToggle = false, onSidebarToggle }: NavbarProps) => 
     });
   };
 
-  // Don't show user dropdown if in MainLayout (sidebar is visible)
+  const isMainPage = !location.pathname.includes("/chat");
   const showUserControls = !location.pathname.includes("/chat") || showSidebarToggle;
 
   return (
-    <header className="border-b">
-      <div className="flex items-center justify-between h-16 px-4">
+    <header className="border-b w-full">
+      <div className="flex items-center justify-between h-16 px-4 container mx-auto">
         <div className="flex items-center gap-4">
           {showSidebarToggle && (
             <Button
@@ -58,16 +58,14 @@ const Navbar = ({ showSidebarToggle = false, onSidebarToggle }: NavbarProps) => 
             </Button>
           )}
           
-          {!user && (
-            <Link to="/" className="flex items-center">
-              <h1 className="text-xl font-bold animated-gradient">capcipcup.ai</h1>
-            </Link>
-          )}
+          <Link to="/" className="flex items-center">
+            <h1 className="text-xl font-bold animated-gradient">capcipcup.ai</h1>
+          </Link>
         </div>
         
         <div className="flex items-center gap-4">
-          {!location.pathname.includes("/chat") && !user && (
-            <div className="flex items-center gap-6">
+          {isMainPage && (
+            <div className="flex items-center gap-6 mr-4">
               <Link to="/privacy" className="text-muted-foreground hover:text-foreground text-sm">
                 Privacy Policy
               </Link>

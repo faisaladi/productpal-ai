@@ -98,7 +98,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   }, {} as Record<string, typeof sampleChatHistory>);
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex w-full">
       <Sidebar>
         <SidebarHeader className="p-3">
           <div className="flex justify-start">
@@ -175,9 +175,9 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         <SidebarRail />
       </Sidebar>
       
-      <div className="flex-1 flex flex-col">
-        <Navbar showSidebarToggle={false} />
-        <main className="flex-1 overflow-y-auto">
+      <div className="flex-1 flex flex-col w-full">
+        <Navbar showSidebarToggle={true} />
+        <main className="flex-1 overflow-y-auto w-full">
           {children}
         </main>
       </div>

@@ -111,7 +111,7 @@ export default {
 				'fade-in': 'fade-in 0.5s ease-out'
 			},
 			fontFamily: {
-				'baldonse': ['Baldonse', 'serif'],
+				'boldonse': ['Boldonse', 'serif'],
 				'nunito': ['Nunito', 'sans-serif']
 			},
 			backgroundImage: {

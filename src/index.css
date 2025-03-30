@@ -1,6 +1,3 @@
-
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -97,7 +94,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-baldonse;
+    @apply font-boldonse;
   }
 
   .gradient-text {
@@ -105,13 +102,19 @@
   }
 }
 
-/* Custom font for Baldonse */
+/* Custom font for Boldonse */
 @font-face {
-  font-family: 'Baldonse';
-  src: url('/fonts/Baldonse.woff2') format('woff2');
+  font-family: 'Boldonse';
+  src: url('/fonts/Boldonse.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
+}
+
+.boldonse-regular {
+  font-family: "Boldonse", system-ui;
+  font-weight: 400;
+  font-style: normal;
 }
 
 /* Custom scrollbar */

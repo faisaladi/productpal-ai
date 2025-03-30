@@ -97,6 +97,11 @@ export default {
 						'background-position': 'right center'
 					}
 				},
+				'gradient-shift': {
+					'0%': { 'background-position': '0% 50%' },
+					'50%': { 'background-position': '100% 50%' },
+					'100%': { 'background-position': '0% 50%' }
+				},
 				'fade-in': {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' }
@@ -108,6 +113,7 @@ export default {
 				'typewriter': 'typewriter 4s ease-out infinite',
 				'blink': 'blink 1s infinite',
 				'gradient-x': 'gradient-x 10s ease infinite',
+				'gradient-shift': 'gradient-shift 8s ease infinite',
 				'fade-in': 'fade-in 0.5s ease-out'
 			},
 			fontFamily: {
@@ -117,7 +123,11 @@ export default {
 			backgroundImage: {
 				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
 				'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
-				'primary-gradient': 'linear-gradient(135deg, #9b87f5 0%, #7161ef 100%)',
+				'primary-gradient': 'linear-gradient(135deg, #9b87f5 0%, #7161ef 25%, #9b87f5 50%, #7161ef 75%, #9b87f5 100%)',
+			},
+			lineHeight: {
+				'relaxed': '1.5',
+        'loose': '2',
 			}
 		}
 	},

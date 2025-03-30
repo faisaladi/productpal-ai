@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -158,4 +159,29 @@
 /* Interactive comparison table hover state */
 .interactive-cell {
   @apply cursor-pointer transition-all duration-200 hover:bg-primary/20;
+}
+
+/* Animated gradient */
+.animated-gradient {
+  background: linear-gradient(135deg, #9b87f5 0%, #7161ef 25%, #9b87f5 50%, #7161ef 75%, #9b87f5 100%);
+  background-size: 300% 300%;
+  animation: gradient-shift 8s ease infinite;
+  @apply bg-clip-text text-transparent;
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Line height for better text spacing */
+.larger-line-height {
+  line-height: 1.4;
 }

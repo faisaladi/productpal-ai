@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowRight, Github, Twitter, Linkedin } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import TemplateCard from "@/components/TemplateCard";
 
@@ -42,15 +42,15 @@ const LandingPage = () => {
       
       <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
         <div className="w-full max-w-3xl mx-auto text-center">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 gradient-text animate-gradient-x">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 animated-gradient leading-relaxed">
             Take decision faster
           </h1>
           
-          <p className="text-lg sm:text-xl md:text-2xl mb-8 text-muted-foreground">
+          <p className="text-lg sm:text-xl md:text-2xl mb-10 text-muted-foreground larger-line-height">
             Capcipcup is a decision making platform. Write down your problem.
           </p>
           
-          <form onSubmit={handleSubmit} className="mb-8">
+          <form onSubmit={handleSubmit} className="mb-12">
             <div className="relative w-full max-w-2xl mx-auto">
               <Input
                 placeholder={prompts[promptIndex]}
@@ -69,7 +69,7 @@ const LandingPage = () => {
           </form>
           
           <div className="text-left">
-            <h2 className="text-lg font-medium mb-4">Example questions</h2>
+            <h2 className="text-lg font-medium mb-6">Example questions</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <TemplateCard 
                 title="Product Comparison" 
@@ -93,18 +93,12 @@ const LandingPage = () => {
           <p className="text-sm text-muted-foreground">
             © 2023 Capcipcup.ai. All rights reserved.
           </p>
-          <div className="flex items-center space-x-4">
-            <Link to="#" className="text-muted-foreground hover:text-foreground">
-              <Twitter className="h-5 w-5" />
-              <span className="sr-only">Twitter</span>
+          <div className="flex items-center space-x-6">
+            <Link to="/privacy" className="text-muted-foreground hover:text-foreground text-sm">
+              Privacy Policy
             </Link>
-            <Link to="#" className="text-muted-foreground hover:text-foreground">
-              <Github className="h-5 w-5" />
-              <span className="sr-only">GitHub</span>
-            </Link>
-            <Link to="#" className="text-muted-foreground hover:text-foreground">
-              <Linkedin className="h-5 w-5" />
-              <span className="sr-only">LinkedIn</span>
+            <Link to="/terms" className="text-muted-foreground hover:text-foreground text-sm">
+              Terms & Conditions
             </Link>
           </div>
         </div>

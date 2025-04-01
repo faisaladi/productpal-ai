@@ -4,7 +4,7 @@ import ReactMarkdown from "react-markdown";
 
 interface Message {
   id: string;
-  role: "user" | "assistant";
+  role: "system" | "user" | "assistant";
   content: string;
   timestamp: Date;
 }

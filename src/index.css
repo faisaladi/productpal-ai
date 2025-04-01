@@ -102,14 +102,7 @@
   }
 }
 
-/* Custom font for Boldonse */
-@font-face {
-  font-family: 'Boldonse';
-  src: url('/fonts/Boldonse.woff2') format('woff2');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
+/* Use Google Fonts for Boldonse */
 
 .boldonse-regular {
   font-family: "Boldonse", system-ui;

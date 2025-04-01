@@ -7,26 +7,30 @@ import Navbar from "@/components/Navbar";
 import ChatSidebar from "@/components/ChatSidebar";
 import ChatMessage from "@/components/ChatMessage";
 import ComparisonTable from "@/components/ComparisonTable";
+import { useChat } from "@/hooks/use-chat";
+import { useToast } from "@/hooks/use-toast";
+import { parseComparisonData } from "@/utils/parseComparisonData";
 
 // Types
 interface Message {
   id: string;
-  role: "user" | "assistant";
+  role: "system" | "user" | "assistant";
   content: string;
   timestamp: Date;
 }
 
-// Sample comparison data for demonstration
-const sampleComparisonData = {
-  products: ["iPhone 16 Pro Max", "Samsung S25 Ultra"],
-  specs: [
-    { name: "Display", values: ["6.9\" Super Retina XDR", "6.8\" Dynamic AMOLED 2X"] },
-    { name: "Processor", values: ["A18 Pro", "Snapdragon 8 Gen 3"] },
-    { name: "RAM", values: ["8GB", "12GB"] },
-    { name: "Storage", values: ["256GB, 512GB, 1TB", "256GB, 512GB, 1TB"] },
-    { name: "Main Camera", values: ["48MP, f/1.8", "200MP, f/1.7"] },
-    { name: "Battery", values: ["4550mAh", "5000mAh"] }
-  ]
+interface ComparisonData {
+  products: string[];
+  specs: {
+    name: string;
+    values: string[];
+  }[];
+}
+
+// Empty comparison data structure
+const emptyComparisonData = {
+  products: [],
+  specs: []
 };
 
 // Initial conversation when there's a search query
@@ -36,29 +40,31 @@ const createInitialConversation = (query: string): Message[] => [
     role: "user",
     content: query,
     timestamp: new Date(),
-  },
-  {
-    id: "2",
-    role: "assistant",
-    content: `I'll help you with that comparison! Let me analyze the specifications and provide a detailed breakdown.
-
-## ${query}
-
-Here's a comparison table of the main specifications:`,
-    timestamp: new Date(),
-  },
+  }
 ];
+
+// Function to extract comparison data from initial messages
+const extractInitialComparisonData = (messages: Message[]): ComparisonData | null => {
+  const assistantMessages = messages.filter(msg => msg.role === "assistant");
+  if (assistantMessages.length > 0) {
+    const latestAssistantMessage = assistantMessages[assistantMessages.length - 1];
+    return parseComparisonData(latestAssistantMessage.content) || null;
+  }
+  return null;
+};
 
 const ChatPage = () => {
   const [searchParams] = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
+  const initialMessages = initialQuery ? createInitialConversation(initialQuery) : [];
+  const initialComparisonData = initialQuery ? extractInitialComparisonData(initialMessages) : null;
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>(
-    initialQuery ? createInitialConversation(initialQuery) : []
-  );
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [inputValue, setInputValue] = useState("");
   const [showComparisonTable, setShowComparisonTable] = useState(!!initialQuery);
+  const [streamingMessage, setStreamingMessage] = useState<Message | null>(null);
+  const [comparisonData, setComparisonData] = useState<ComparisonData | null>(initialComparisonData);
   const [user, setUser] = useState<{ email: string } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -80,34 +86,78 @@ const ChatPage = () => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const { toast } = useToast();
+  const { sendMessage, isLoading, error } = useChat({
+    initialMessages: messages,
+    model: "openai/gpt-4o-2024-11-20",
+    temperature: 0.7,
+    maxTokens: 2000,
+    stream: true,
+    onChunk: (chunk) => {
+      setStreamingMessage((prev) => ({
+        id: 'streaming',
+        role: chunk.role,
+        content: prev ? prev.content + chunk.content : chunk.content,
+        timestamp: new Date(),
+      }));
+    },
+  });
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  }, [error, toast]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (inputValue.trim()) {
-      // Add user message
-      const newUserMessage: Message = {
-        id: Date.now().toString(),
-        role: "user",
-        content: inputValue,
+    if (!inputValue.trim() || isLoading) return;
+
+    const userMessage: Message = {
+      id: Math.random().toString(),
+      role: "user",
+      content: inputValue,
+      timestamp: new Date(),
+    };
+
+    setInputValue("");
+    setMessages((prev) => [...prev, userMessage]);
+
+    try {
+      const response = await sendMessage(inputValue);
+      
+      // Update messages with AI response
+      const assistantMessage = {
+        id: Math.random().toString(),
+        role: response.role,
+        content: response.content,
         timestamp: new Date(),
       };
-      
-      setMessages((prev) => [...prev, newUserMessage]);
-      setInputValue("");
-      
-      // Simulate AI response (in a real app, this would be an API call)
-      setTimeout(() => {
-        const newAiMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          role: "assistant",
-          content: `I'll analyze your question about "${inputValue}" and provide a detailed comparison.
 
-Based on my research, here are the key points to consider:`,
-          timestamp: new Date(),
-        };
-        
-        setMessages((prev) => [...prev, newAiMessage]);
-        setShowComparisonTable(true);
-      }, 1000);
+      setStreamingMessage(null);
+      const updatedMessages = [...messages, userMessage, assistantMessage];
+
+      // Check for comparison data in the latest assistant message
+      if (assistantMessage.role === "assistant") {
+        const parsedData = parseComparisonData(assistantMessage.content);
+        if (parsedData) {
+          setComparisonData(parsedData);
+          setShowComparisonTable(true);
+        }
+      }
+
+      setMessages(updatedMessages);
+    } catch (err) {
+      console.error("Failed to send message:", err);
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -136,7 +186,36 @@ Based on my research, here are the key points to consider:`,
                 <Button 
                   variant="outline" 
                   className="h-24 flex flex-col items-center justify-center gap-2 p-4"
-                  onClick={() => setInputValue("Compare iPhone 16 Pro Max vs Samsung S25 Ultra")}
+                  onClick={async () => {
+                    const message = "Compare iPhone 16 Pro Max vs Samsung S25 Ultra";
+                    setInputValue("");
+                    const userMessage: Message = {
+                      id: Math.random().toString(),
+                      role: "user",
+                      content: message,
+                      timestamp: new Date(),
+                    };
+                    setMessages(prev => [...prev, userMessage]);
+                    const response = await sendMessage(message);
+                    if (response) {
+                      const assistantMessage = {
+                        id: Math.random().toString(),
+                        role: response.role,
+                        content: response.content,
+                        timestamp: new Date(),
+                      };
+                      setStreamingMessage(null);
+                      setMessages(prev => [...prev, userMessage, assistantMessage]);
+                      if (assistantMessage.role === "assistant") {
+                        const parsedData = parseComparisonData(assistantMessage.content);
+                        if (parsedData) {
+                          setComparisonData(parsedData);
+                          setShowComparisonTable(true);
+                        }
+                      }
+                    }
+                  }}
+
                 >
                   <span className="text-lg font-medium">Product Comparison</span>
                   <span className="text-sm text-muted-foreground">Compare features, specs, and prices</span>
@@ -144,7 +223,36 @@ Based on my research, here are the key points to consider:`,
                 <Button 
                   variant="outline" 
                   className="h-24 flex flex-col items-center justify-center gap-2 p-4"
-                  onClick={() => setInputValue("What's the best laptop for video editing?")}
+                  onClick={async () => {
+                    const message = "What's the best laptop for video editing?";
+                    setInputValue("");
+                    const userMessage: Message = {
+                      id: Math.random().toString(),
+                      role: "user",
+                      content: message,
+                      timestamp: new Date(),
+                    };
+                    setMessages(prev => [...prev, userMessage]);
+                    const response = await sendMessage(message);
+                    if (response) {
+                      const assistantMessage = {
+                        id: Math.random().toString(),
+                        role: response.role,
+                        content: response.content,
+                        timestamp: new Date(),
+                      };
+                      setStreamingMessage(null);
+                      setMessages(prev => [...prev, userMessage, assistantMessage]);
+                      if (assistantMessage.role === "assistant") {
+                        const parsedData = parseComparisonData(assistantMessage.content);
+                        if (parsedData) {
+                          setComparisonData(parsedData);
+                          setShowComparisonTable(true);
+                        }
+                      }
+                    }
+                  }}
+
                 >
                   <span className="text-lg font-medium">Find Recommendations</span>
                   <span className="text-sm text-muted-foreground">Get personalized suggestions</span>
@@ -159,32 +267,29 @@ Based on my research, here are the key points to consider:`,
                   message={message}
                 />
               ))}
+              {streamingMessage && (
+                <ChatMessage
+                  key="streaming"
+                  message={streamingMessage}
+                />
+              )}
               
-              {showComparisonTable && (
+              {showComparisonTable && comparisonData && (
                 <div className="my-4 animate-fade-in">
-                  <ComparisonTable data={sampleComparisonData} />
+                  <ComparisonTable data={comparisonData} />
                   
+                  {/* Verdict section will be generated from AI responses */}
                   <div className="mt-8 p-4 bg-secondary rounded-lg">
                     <h3 className="font-semibold text-lg mb-2">Verdict</h3>
                     <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <h4 className="font-medium text-primary">iPhone 16 Pro Max</h4>
-                        <p className="mt-2 text-sm">
-                          <span className="font-semibold">Pros:</span> Superior software optimization, better long-term support, excellent camera system for most users, strong ecosystem integration.
-                        </p>
-                        <p className="mt-2 text-sm">
-                          <span className="font-semibold">Choose when:</span> You're already in the Apple ecosystem, prioritize ease of use, or need reliable performance for years.
-                        </p>
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-primary">Samsung S25 Ultra</h4>
-                        <p className="mt-2 text-sm">
-                          <span className="font-semibold">Pros:</span> Higher specifications, more versatile camera system, larger battery, S-Pen functionality, more customization options.
-                        </p>
-                        <p className="mt-2 text-sm">
-                          <span className="font-semibold">Choose when:</span> You want cutting-edge hardware specs, need the versatility of Android, or use the S-Pen for productivity.
-                        </p>
-                      </div>
+                      {comparisonData.products.map((product, index) => (
+                        <div key={index}>
+                          <h4 className="font-medium text-primary">{product}</h4>
+                          <div className="mt-2 space-y-2 text-sm">
+                            {/* The verdict content will come from AI responses */}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -206,11 +311,15 @@ Based on my research, here are the key points to consider:`,
                 onChange={(e) => setInputValue(e.target.value)}
               />
               <div className="absolute right-2 top-2 flex items-center gap-1">
-                <Button type="button" size="icon" variant="ghost">
+                <Button type="button" size="icon" variant="ghost" disabled={isLoading}>
                   <Mic className="h-5 w-5" />
                 </Button>
-                <Button type="submit" size="icon">
-                  <Send className="h-5 w-5" />
+                <Button type="submit" size="icon" disabled={isLoading}>
+                  {isLoading ? (
+                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                  ) : (
+                    <Send className="h-5 w-5" />
+                  )}
                 </Button>
               </div>
             </div>

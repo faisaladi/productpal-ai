@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChatMessage, createChatCompletion } from "@/integrations/openrouter/client";
+import { ChatMessage, createChatCompletion } from "@/integrations/google/client";
 
 export type UseChatOptions = {
   initialMessages?: ChatMessage[];
@@ -20,15 +20,23 @@ export function useChat(options: UseChatOptions = {}) {
       setIsLoading(true);
       setError(null);
 
+      // Clear previous messages if it's a new comparison query
+      const isComparisonQuery = content.toLowerCase().includes('vs') || 
+                               content.toLowerCase().includes('or');
+      if (isComparisonQuery) {
+        setMessages([]);
+      }
+
       // Add user message to chat
       const userMessage: ChatMessage = { role: "user", content };
+      const currentMessages = isComparisonQuery ? [] : messages;
       setMessages((prev) => [...prev, userMessage]);
 
       // Get AI response
-      const response = await createChatCompletion([...messages, userMessage], {
+      const response = await createChatCompletion([...currentMessages, userMessage], {
         model: options.model,
         temperature: options.temperature,
-        maxTokens: options.maxTokens,
+        maxOutputTokens: options.maxTokens,
         stream: options.stream,
         onChunk: options.onChunk,
       });

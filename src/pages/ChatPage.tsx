@@ -14,7 +14,7 @@ import { parseComparisonData } from "@/utils/parseComparisonData";
 // Types
 interface Message {
   id: string;
-  role: "system" | "user" | "assistant";
+  role: "assistant" | "user" | "system";
   content: string;
   timestamp: Date;
 }
@@ -88,8 +88,16 @@ const ChatPage = () => {
 
   const { toast } = useToast();
   const { sendMessage, isLoading, error } = useChat({
-    initialMessages: messages,
-    model: "openai/gpt-4o-2024-11-20",
+    initialMessages: [
+      {
+        id: 'system',
+        role: 'system',
+        content: 'Craft a casual, product advisor-style prompt for a decision-making app. The user inputs a question about a decision they need to make, outlining the alternatives. The AI should respond with a comparative analysis presented as a markdown table with columns for "Key Features" and each alternative (e.g., "Comparison 1," "Comparison 2," etc.). Following the table, the AI should provide a verdict recommending a decision and outlining the conditions under which that recommendation applies.',
+        timestamp: new Date(),
+      },
+      ...messages
+    ],
+    model: "gemini-2.0-flash",
     temperature: 0.7,
     maxTokens: 2000,
     stream: true,
@@ -131,9 +139,9 @@ const ChatPage = () => {
       const response = await sendMessage(inputValue);
       
       // Update messages with AI response
-      const assistantMessage = {
+      const assistantMessage: Message = {
         id: Math.random().toString(),
-        role: response.role,
+        role: response.role as "assistant" | "user" | "system",
         content: response.content,
         timestamp: new Date(),
       };
@@ -198,9 +206,9 @@ const ChatPage = () => {
                     setMessages(prev => [...prev, userMessage]);
                     const response = await sendMessage(message);
                     if (response) {
-                      const assistantMessage = {
+                      const assistantMessage: Message = {
                         id: Math.random().toString(),
-                        role: response.role,
+                        role: response.role as "assistant" | "user" | "system",
                         content: response.content,
                         timestamp: new Date(),
                       };
@@ -237,7 +245,7 @@ const ChatPage = () => {
                     if (response) {
                       const assistantMessage = {
                         id: Math.random().toString(),
-                        role: response.role,
+                        role: response.role as "assistant" | "user" | "system",
                         content: response.content,
                         timestamp: new Date(),
                       };
